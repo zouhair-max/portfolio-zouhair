@@ -229,7 +229,7 @@ function Home() {
 
           {/* Stats */}
           <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 py-4 md:py-6"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 py-4 md:py-0 "
             variants={containerVariants}
           >
             {stats.map((stat, index) => (
@@ -253,7 +253,7 @@ function Home() {
 
           {/* CTA Buttons */}
           <motion.div 
-            className="flex flex-col  sm:flex-row gap-4 md:gap-6 pt-4 md:pt-6 justify-center lg:justify-start"
+            className="flex flex-col  sm:flex-row gap-4 md:gap-6 pt-4 md:pt-0 -mt-10 justify-center lg:justify-cnter"
             variants={containerVariants}
           >
             <motion.button

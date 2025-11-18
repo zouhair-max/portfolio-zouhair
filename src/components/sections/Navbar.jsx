@@ -40,33 +40,40 @@ const PortfolioNavbar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [isHoveringLogo, setIsHoveringLogo] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [screenSize, setScreenSize] = useState('desktop');
 
   const navRef = useRef(null);
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const mobileMenuButtonRef = useRef(null);
 
-  // Check if mobile on mount and resize
+  // Screen size detection for responsive behavior
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      if (width < 1024) {
+        setScreenSize('mobile');
+      } else if (width >= 1024 && width < 1280) {
+        setScreenSize('tablet');
+      } else if (width >= 1280 && width < 1536) {
+        setScreenSize('desktop');
+      } else {
+        setScreenSize('large-desktop');
+      }
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Close dropdown and mobile menu when clicking outside - CORRIGÉ
+  // Close dropdown and mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Fermer le dropdown de langue
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowLanguageDropdown(false);
       }
 
-      // Fermer le menu mobile si on clique en dehors
       if (isOpen && 
           mobileMenuRef.current && 
           !mobileMenuRef.current.contains(event.target) &&
@@ -87,7 +94,6 @@ const PortfolioNavbar = () => {
 
   // Scroll to section
   const scrollToSection = useCallback((sectionId) => {
-    // Correction de la faute de frappe 'hgome' vers 'home'
     if (sectionId === 'hgome') sectionId = 'home';
     
     const element = document.getElementById(sectionId);
@@ -114,7 +120,7 @@ const PortfolioNavbar = () => {
 
     const observerOptions = {
       root: null,
-      rootMargin: isMobile ? '-10% 0px -80% 0px' : '-20% 0px -70% 0px',
+      rootMargin: screenSize === 'mobile' ? '-10% 0px -80% 0px' : '-20% 0px -70% 0px',
       threshold: 0,
     };
 
@@ -137,7 +143,7 @@ const PortfolioNavbar = () => {
       window.removeEventListener('scroll', handleScroll);
       observer.disconnect();
     };
-  }, [isMobile]);
+  }, [screenSize]);
 
   // Theme effect
   useEffect(() => {
@@ -163,29 +169,28 @@ const PortfolioNavbar = () => {
     setShowLanguageDropdown(false);
   };
 
-  // Close mobile menu when orientation changes
+  // Close mobile menu when orientation changes or resizing above 1024px
   useEffect(() => {
     const handleOrientationChange = () => {
       if (isOpen) setIsOpen(false);
     };
     
-    window.addEventListener('orientationchange', handleOrientationChange);
-    return () => window.removeEventListener('orientationchange', handleOrientationChange);
-  }, [isOpen]);
-
-  // Fermer le menu mobile quand on redimensionne au-dessus de 1024px
-  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024 && isOpen) {
         setIsOpen(false);
       }
     };
 
+    window.addEventListener('orientationchange', handleOrientationChange);
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [isOpen]);
 
-  // MenuItem component
+  // MenuItem component with responsive adjustments
   const MenuItem = ({ item, isMobile = false }) => {
     const IconComponent = item.icon;
     const isActive = activeItem === item.id;
@@ -213,7 +218,6 @@ const PortfolioNavbar = () => {
             />
             <span className="relative z-10 font-semibold">{t(`nav.${item.labelKey}`)}</span>
             
-            {/* Active indicator for mobile */}
             {isActive && (
               <div className={`absolute ${isRTL ? 'left-4' : 'right-4'} w-2 h-2 bg-white rounded-full`}></div>
             )}
@@ -222,28 +226,38 @@ const PortfolioNavbar = () => {
       );
     }
 
+    // Desktop menu item with responsive text
     return (
       <li>
         <button
           onClick={() => scrollToSection(item.id)}
           className={`
-            flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm
+            flex items-center gap-2 px-3 py-2.5 rounded-xl font-medium
             transition-all duration-300 ease-in-out relative group
             ${isRTL ? "flex-row-reverse" : ""}
             ${isActive 
               ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/25" 
               : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-cyan-600 dark:hover:text-cyan-400 border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
             }
-            lg:px-3 lg:py-2 xl:px-4 xl:py-2.5
+            ${screenSize === 'tablet' ? 'text-xs px-2 py-2' : 
+              screenSize === 'desktop' ? 'text-sm px-3 py-2.5' : 
+              'text-sm px-4 py-2.5'
+            }
           `}
         >
           <IconComponent 
-            size={18} 
+            size={screenSize === 'tablet' ? 16 : 18} 
             className={`transition-all duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-105'}`} 
           />
-          <span className="relative z-10 hidden sm:inline-block">{t(`nav.${item.labelKey}`)}</span>
           
-          {/* Active indicator for desktop */}
+          {/* Show text based on screen size */}
+          <span className={`
+            relative z-10 transition-all duration-300
+            ${screenSize === 'tablet' ? 'hidden lg:inline-block' : 'inline-block'}
+          `}>
+            {t(`nav.${item.labelKey}`)}
+          </span>
+          
           {isActive && (
             <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-cyan-400 rounded-full"></div>
           )}
@@ -256,6 +270,28 @@ const PortfolioNavbar = () => {
   const isRTL = currentLanguage === 'ar';
   const currentLanguageObj = NAV_CONFIG.languages.find(lang => lang.code === currentLanguage);
 
+  // Responsive logo size
+  const getLogoSize = () => {
+    switch(screenSize) {
+      case 'mobile': return 'h-20';
+      case 'tablet': return 'h-24';
+      case 'desktop': return 'h-28';
+      case 'large-desktop': return 'h-32';
+      default: return 'h-24';
+    }
+  };
+
+  // Responsive navbar height
+  const getNavbarHeight = () => {
+    switch(screenSize) {
+      case 'mobile': return 'h-16';
+      case 'tablet': return 'h-18';
+      case 'desktop': return 'h-20';
+      case 'large-desktop': return 'h-22';
+      default: return 'h-20';
+    }
+  };
+
   return (
     <>
       <nav 
@@ -263,10 +299,10 @@ const PortfolioNavbar = () => {
         className={`
           fixed w-full top-0 z-50 transition-all duration-500 ease-out   
           ${scrolled 
-            ? "bg-transparent dark:bg-transparent backdrop-blur-xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 border-b border-gray-100/50 dark:border-gray-800/50" 
-            : "bg-transparent dark:bg-transparent backdrop-blur-md"
+            ? "bg-transparent dark:bg-gray-900/80 backdrop-blur-xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 border-b border-gray-100/50 dark:border-gray-800/50" 
+            : "bg-transparent dark:bg-gray-900/70 backdrop-blur-md"
           }
-          md:h-16 xl:h-20
+          ${getNavbarHeight()}
         `}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
@@ -274,22 +310,26 @@ const PortfolioNavbar = () => {
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full"
+          className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 h-full"
         >
-          <div className="flex items-center justify-between h-full">
+          <div className="flex items-center justify-between h-full ml-7">
 
-            {/* Logo */}
+            {/* Logo - Responsive positioning */}
             <div
-              className={`${isMobile ? "" : "flex items-center group cursor-pointer  md:-ml-14 xl:-ml-72 xxl:-ml-72"}`}
+              className={`flex items-center group cursor-pointer ${
+                screenSize === 'tablet' ? "lg:-ml-8" : 
+                screenSize === 'desktop' ? "xl:-ml-16" : 
+                screenSize === 'large-desktop' ? "xxl:-ml-20" : ""
+              }`}
               onMouseEnter={() => setIsHoveringLogo(true)}
               onMouseLeave={() => setIsHoveringLogo(false)}
-              onClick={() => scrollToSection('home')} // Correction de 'hgome' vers 'home'
+              onClick={() => scrollToSection('home')}
             >
               <div className="relative">
                 <img 
                   src={logo} 
                   alt="Logo" 
-                  className={`h-24 lg:h-36 w-auto transition-all duration-500 ${
+                  className={`${getLogoSize()} w-auto transition-all duration-500 ${
                     isHoveringLogo ? 'scale-110 rotate-3' : 'scale-100 rotate-0'
                   }`}
                 />
@@ -302,36 +342,47 @@ const PortfolioNavbar = () => {
               </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:block">
-              <ul className={`flex ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-0'} md:space-x-0 xl:space-x-3'`}>
+            {/* Desktop Navigation - Responsive spacing */}
+            <div className="hidden lg:block flex-1">
+              <ul className={`flex justify-center ${isRTL ? 'space-x-reverse' : ''} ${
+                screenSize === 'tablet' ? 'space-x-1' : 
+                screenSize === 'desktop' ? 'space-x-2' : 
+                'space-x-3'
+              }`}>
                 {NAV_CONFIG.menuItems.map((item) => (
                   <MenuItem key={item.id} item={item} />
                 ))}
               </ul>
             </div>
 
-            {/* Desktop Right Side Menu */}
-            <div className="hidden lg:flex items-center space-x-4">
-              <div className="items-center flex  md:mr-[10px] xl:ml-80 xl:-mr-[200px] ">
+            {/* Desktop Right Side Menu - Responsive positioning */}
+            <div className="hidden lg:flex items-center space-x-3">
+              <div className={`flex items-center ${
+                screenSize === 'tablet' ? 'mr-2 space-x-2' : 
+                screenSize === 'desktop' ? 'mr-4 space-x-3' : 
+                'mr-6 space-x-4'
+              }`}>
 
                 {/* Language Selector */}
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-                    className="
-                      flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium 
-                      bg-gray-50 dark:bg-gradient-to-r from-cyan-500 to-cyan-600 text-gray-700 dark:text-gray-200
-                      hover:bg-white dark:hover:bg-gray-700/90 border border-cyan-400/30
+                    className={`
+                      flex items-center gap-2 px-3 py-2 rounded-xl font-medium 
+                      bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200
+                      hover:bg-white dark:hover:bg-gray-700/90 border border-gray-200 dark:border-gray-700
                       hover:shadow-md transition-all duration-300 hover:scale-105 backdrop-blur-sm
-                      min-h-[44px] min-w-[44px] justify-center
-                    "
+                      min-h-[44px] justify-center
+                      ${screenSize === 'tablet' ? 'text-xs px-2' : 'text-sm px-3'}
+                    `}
                     aria-label="Select language"
                   >
-                    <Globe size={16} className="text-cyan-500 dark:text-white" />
-                    <span className="font-semibold hidden sm:block">{currentLanguage.toUpperCase()}</span>
+                    <Globe size={screenSize === 'tablet' ? 14 : 16} className="text-cyan-500 dark:text-cyan-400" />
+                    <span className={`font-semibold ${screenSize === 'tablet' ? 'hidden' : 'block'}`}>
+                      {currentLanguage.toUpperCase()}
+                    </span>
                     <ChevronDown 
-                      size={14} 
+                      size={screenSize === 'tablet' ? 12 : 14} 
                       className={`transition-transform duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} 
                     />
                   </button>
@@ -370,33 +421,36 @@ const PortfolioNavbar = () => {
                 </div>
 
                 {/* Theme Toggle */}
-                <div className="relative ml-3">
+                <div className="relative">
                   <button
                     onClick={() => setIsDarkMode(!isDarkMode)}
-                    className="
-                      p-3 rounded-xl bg-gray-50 dark:bg-gradient-to-r from-cyan-500 to-cyan-600
-                      text-gray-600 dark:text-white hover:text-amber-500 border border-cyan-400/30 dark:hover:text-amber-400
+                    className={`
+                      p-3 rounded-xl bg-gray-50 dark:bg-gray-800
+                      text-gray-600 dark:text-gray-300 hover:text-amber-500 dark:hover:text-amber-400
                       hover:bg-white dark:hover:bg-gray-700/90 hover:shadow-md
                       transition-all duration-300 hover:scale-110 backdrop-blur-sm
                       min-h-[44px] min-w-[44px] flex items-center justify-center
-                    "
+                    `}
                     aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
                   >
-                    {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                    {isDarkMode ? 
+                      <Sun size={screenSize === 'tablet' ? 18 : 20} /> : 
+                      <Moon size={screenSize === 'tablet' ? 18 : 20} />
+                    }
                   </button>
                 </div>
 
                 {/* Download CV Button */}
-                <div className="relative ml-5">
+                <div className="relative">
                   <button 
-                    className="
+                    className={`
                       flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-cyan-600
-                      text-white px-6 py-2.5 rounded-xl font-semibold text-sm
-                      hover:from-cyan-600 hover:to-cyan-700 transition-all duration-300
-                      hover:shadow-lg hover:scale-105 shadow-lg shadow-cyan-500/25
-                      border border-cyan-400/30 relative overflow-hidden group
-                      min-h-[44px] 
-                    "
+                      text-white rounded-xl font-semibold transition-all duration-300
+                      hover:from-cyan-600 hover:to-cyan-700 hover:shadow-lg hover:scale-105 
+                      shadow-lg shadow-cyan-500/25 border border-cyan-400/30 relative overflow-hidden group
+                      min-h-[44px]
+                      ${screenSize === 'tablet' ? 'px-3 py-2 text-xs' : 'px-4 py-2.5 text-sm'}
+                    `}
                     onClick={() => {
                       const link = document.createElement('a');
                       link.href = '/cv.pdf';
@@ -405,8 +459,10 @@ const PortfolioNavbar = () => {
                     }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                    <Download size={16} className="relative z-10" />
-                    <span className="relative z-10 hidden sm:inline-block">Download CV</span>
+                    <Download size={screenSize === 'tablet' ? 14 : 16} className="relative z-10" />
+                    <span className={`relative z-10 ${screenSize === 'tablet' ? 'hidden' : 'inline-block'}`}>
+                      Download CV
+                    </span>
                     <span className="relative z-10 sm:hidden">CV</span>
                   </button>
                 </div>
@@ -440,7 +496,6 @@ const PortfolioNavbar = () => {
               >
                 {isOpen ? <X size={22} /> : <Menu size={22} />}
                 
-                {/* Mobile menu indicator */}
                 {!isOpen && (
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-500 rounded-full animate-pulse"></div>
                 )}
@@ -456,13 +511,13 @@ const PortfolioNavbar = () => {
             lg:hidden transition-all duration-500 overflow-y-auto ease-in-out overflow-hidden
             ${isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}
             bg-white dark:bg-[#121212] backdrop-blur-xl border-t border-gray-100/50 dark:border-gray-800/50
-            shadow-2xl absolute top-full left-0 right-0 pb-20 pl-6
+            shadow-2xl absolute top-full left-0 right-0
           `}
           style={{
             maxHeight: isOpen ? 'calc(100vh - 64px)' : '0px'
           }}
         >
-          <div className="px-4 py-4 space-y-2 max-h-[100vh] overflow-y-auto">
+          <div className="px-4 py-4 space-y-2 max-h-[70vh] overflow-y-auto">
             {NAV_CONFIG.menuItems.map((item) => (
               <MenuItem key={item.id} item={item} isMobile={true} />
             ))}
@@ -546,8 +601,8 @@ const PortfolioNavbar = () => {
         </div>
       </nav>
 
-      {/* Spacer for fixed navbar */}
-      <div className="h-16 lg:h-20"></div>
+      {/* Responsive spacer for fixed navbar */}
+      <div className={getNavbarHeight()}></div>
     </>
   );
 };
