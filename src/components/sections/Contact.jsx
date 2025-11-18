@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import imagec from "../../assets/imageC.jpg";
 import { motion } from 'framer-motion';
-import { FiMail, FiPhone, FiMapPin, FiSend, FiLinkedin } from 'react-icons/fi';
+import { FiMail, FiPhone, FiMapPin, FiSend, FiLinkedin, FiGithub } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useForm, ValidationError } from '@formspree/react';
 
@@ -65,7 +65,14 @@ function Contact() {
     { 
       icon: FiLinkedin, 
       href: "https://www.linkedin.com/in/boudeir-zouhair2005", 
-      color: "hover:text-blue-600" 
+      color: "hover:text-blue-600",
+      name: "LinkedIn"
+    },
+    { 
+      icon: FiGithub, 
+      href: "https://github.com/zouhair-max", 
+      color: "hover:text-gray-800 dark:hover:text-white",
+      name: "GitHub"
     },
   ];
 
@@ -90,10 +97,10 @@ function Contact() {
     callToAction: t('contact.callToAction', 'Don\'t hesitate to reach out. I\'ll reply as soon as possible and we can start creating something extraordinary together.'),
     emailLabel: t('contact.emailLabel', 'Email'),
     phoneLabel: t('contact.phoneLabel', 'Phone'),
-    locationLabel: t('contact.locationLabel', 'Location')
+    locationLabel: t('contact.locationLabel', 'Location'),
+    connectWithMe: t('contact.connectWithMe', 'Connect with me'),
+    viewMyWork: t('contact.viewMyWork', 'View my projects on GitHub')
   };
-
-  
 
   return (
     <section id="contact" className="min-h-screen py-20 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
@@ -166,6 +173,23 @@ function Contact() {
                 >
                   <FiPhone className="text-2xl text-blue-600 dark:text-blue-400" />
                 </motion.div>
+
+                {/* GitHub Floating Icon */}
+                <motion.div
+                  animate={{ 
+                    y: [0, -15, 0],
+                    rotate: [0, 10, 0]
+                  }}
+                  transition={{ 
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 2
+                  }}
+                  className="absolute -top-4 -left-4 bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-lg dark:shadow-gray-900"
+                >
+                  <FiGithub className="text-2xl text-gray-700 dark:text-gray-300" />
+                </motion.div>
               </div>
             </motion.div>
 
@@ -214,10 +238,34 @@ function Contact() {
                     <p className="text-gray-800 dark:text-white font-medium">Casablanca, Morocco</p>
                   </div>
                 </motion.div>
+
+                {/* GitHub Link */}
+                <motion.div 
+                  whileHover={{ x: 5 }}
+                  className="flex items-center space-x-4 p-3 rounded-lg hover:bg-white dark:hover:bg-gray-800 hover:shadow-md transition-all dark:border dark:border-gray-700"
+                >
+                  <div className="p-2 bg-gray-100 dark:bg-gray-900/30 rounded-lg">
+                    <FiGithub className="text-gray-700 dark:text-gray-300 text-xl" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">GitHub</p>
+                    <a 
+                      href="https://github.com/zouhair-max" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-gray-800 dark:text-white font-medium hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+                    >
+                      github.com/zouhair-max
+                    </a>
+                  </div>
+                </motion.div>
               </div>
 
               {/* Social Media Links */}
               <motion.div variants={itemVariants} className="pt-4">
+                <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                  {content.connectWithMe}
+                </h4>
                 <div className="flex space-x-4">
                   {socialLinks.map((social, index) => (
                     <motion.a
@@ -227,12 +275,37 @@ function Contact() {
                       rel="noopener noreferrer"
                       whileHover={{ scale: 1.2, y: -2 }}
                       whileTap={{ scale: 0.9 }}
-                      className={`p-3 bg-white dark:bg-gray-800 rounded-xl shadow-md transition-colors dark:shadow-gray-900 ${social.color} border border-gray-200 dark:border-gray-700`}
+                      className={`p-3 bg-white dark:bg-gray-800 rounded-xl shadow-md transition-all duration-300 dark:shadow-gray-900 ${social.color} border border-gray-200 dark:border-gray-700 group relative`}
+                      title={social.name}
                     >
                       <social.icon className="text-xl" />
+                      {/* Tooltip */}
+                      <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                        {social.name}
+                      </div>
                     </motion.a>
                   ))}
                 </div>
+                
+                {/* GitHub Call to Action */}
+                <motion.div 
+                  className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-cyan-50 dark:from-gray-800 dark:to-cyan-900/20 rounded-xl border border-gray-200 dark:border-gray-700"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                    {content.viewMyWork}
+                  </p>
+                  <motion.a
+                    href="https://github.com/zouhair-max"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-medium hover:gap-3 transition-all duration-300"
+                    whileHover={{ x: 5 }}
+                  >
+                    <FiGithub className="text-lg" />
+                    <span>Explore my GitHub</span>
+                  </motion.a>
+                </motion.div>
               </motion.div>
             </motion.div>
           </motion.div>
