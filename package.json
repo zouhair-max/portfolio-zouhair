@@ -2,12 +2,14 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "lucide-react": "^0.563.0",
     "next": "16.1.4",
     "react": "19.2.3",
