@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import { useI18n } from '../i18n/I18nContext';
-import { ExternalLink, Github, Play, X, Code2, Filter, Sparkles, TrendingUp, Award, ChevronRight, Zap, Layers, Users, Globe, Smartphone, Palette, Clock, CheckCircle } from 'lucide-react';
+import { Play, X, Code2, Filter, Sparkles, TrendingUp, Award, ChevronRight, Zap, Layers, Users, Globe, Smartphone, Palette, Clock, CheckCircle } from 'lucide-react';
 
 // ============================================
 // ENHANCED DESIGN SYSTEM & CONSTANTS
@@ -836,40 +836,6 @@ const EnhancedProjectModal = React.memo(({ project, onClose }) => {
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t"
-              style={{ borderColor: ENHANCED_DESIGN_CONFIG.colors.surface.tertiary }}
-            >
-              <a
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex-1 flex items-center justify-center gap-3 px-6 py-4 rounded-2xl font-semibold transition-all duration-300 hover:scale-105"
-                style={{
-                  background: ENHANCED_DESIGN_CONFIG.colors.gradient.primary,
-                  color: '#FFFFFF',
-                  boxShadow: `0 10px 40px ${ENHANCED_DESIGN_CONFIG.colors.accent.primary}30`
-                }}
-              >
-                <ExternalLink className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
-                View Live Project
-              </a>
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex-1 flex items-center justify-center gap-3 px-6 py-4 rounded-2xl font-semibold transition-all duration-300 hover:scale-105"
-                style={{
-                  background: ENHANCED_DESIGN_CONFIG.colors.surface.secondary,
-                  color: ENHANCED_DESIGN_CONFIG.colors.text.primary,
-                  border: ENHANCED_DESIGN_CONFIG.effects.border.glass
-                }}
-              >
-                <Github className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
-                View Source Code
-              </a>
             </div>
           </div>
         </div>
