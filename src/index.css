@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 13%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 53%;
+    --accent: 0 0% 13%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 13%;
+    --input: 0 0% 13%;
+    --ring: 0 0% 100%;
+    --radius: 0rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-bg-primary text-text-primary font-sans antialiased;
+    overflow-x: hidden;
+  }
+  
+  ::selection {
+    background: rgba(139, 0, 0, 0.5);
+    color: white;
+  }
+}
+
+@layer components {
+  .text-gradient {
+    background: linear-gradient(to bottom, #888888 0%, #ffffff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .grid-lines {
+    background-image: 
+      linear-gradient(to right, #222222 1px, transparent 1px),
+      linear-gradient(to bottom, #222222 1px, transparent 1px);
+    background-size: 25% 100%;
+  }
+  
+  .section-light {
+    @apply bg-bg-light text-text-dark;
+  }
+  
+  .section-dark {
+    @apply bg-bg-primary text-text-primary;
+  }
+  
+  .label-uppercase {
+    @apply text-xs font-medium tracking-widest uppercase text-text-secondary;
+  }
+  
+  .heading-hero {
+    @apply text-[15vw] font-black leading-[0.85] tracking-[-0.04em];
+  }
+  
+  .heading-section {
+    @apply text-[6vw] font-extrabold leading-[0.9] tracking-[-0.03em];
+  }
+  
+  .stat-number {
+    @apply text-[5rem] font-bold leading-none tracking-[-0.02em];
+  }
+}
+
+@layer utilities {
+  .transition-custom {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .will-change-transform {
+    will-change: transform;
+  }
+  
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}
