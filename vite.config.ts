@@ -6,7 +6,11 @@ import { inspectAttr } from 'kimi-plugin-inspect-react'
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
-  plugins: [inspectAttr(), react()],
+  plugins: [
+    // Only include inspect plugin in development
+    ...(process.env.NODE_ENV === 'development' ? [inspectAttr()] : []),
+    react()
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
